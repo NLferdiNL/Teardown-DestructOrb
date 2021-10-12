@@ -1,25 +1,55 @@
 #include "datascripts/keybinds.lua"
 
-moddataPrefix = "savegame.mod.sphereDestroyer"
+moddataPrefix = "savegame.mod.destructorb"
 
 function saveFileInit()
 	saveVersion = GetInt(moddataPrefix .. "Version")
+	maxTick = tonumber(GetString(moddataPrefix .. "MaxTick"))
+	damageAlternating = GetInt(moddataPrefix .. "dAlt")
+	particleAlternating = GetInt(moddataPrefix .. "pAlt")
 	
-	binds["Disable_Sphere"] = GetString(moddataPrefix.. "DisableSphereKey")
+	loadKeyBinds()
 	
 	if saveVersion < 1 or saveVersion == nil then
 		saveVersion = 1
 		SetInt(moddataPrefix .. "Version", saveVersion)
 		
-		binds["Disable_Sphere"] = getFromBackup("Disable_Sphere")
-		SetString(moddataPrefix.. "DisableSphereKey", binds["Disable_Sphere"])
+		maxTick = 0.1
+		SetString(moddataPrefix .. "MaxTick", maxTick .. "")
+		
+		damageAlternating = 0
+		SetInt(moddataPrefix .. "dAlt", damageAlternating)
+		
+		particleAlternating = 5
+		SetInt(moddataPrefix .. "pAlt", particleAlternating)
+	end
+end
+
+
+function loadKeyBinds()
+	for i = 1, #bindOrder do
+		local currBindID = bindOrder[i]
+		local boundKey = GetString(moddataPrefix .. "Keybind" .. currBindID)
+		
+		if boundKey == nil or boundKey == "" then
+			boundKey = getFromBackup(currBindID)
+		end
+		
+		binds[currBindID] = boundKey
 	end
 end
 
 function saveKeyBinds()
-	SetString(moddataPrefix.. "DisableSphereKey", binds["Disable_Sphere"])
+	for i = 1, #bindOrder do
+		local currBindID = bindOrder[i]
+		local boundKey = binds[currBindID]
+		
+		SetString(moddataPrefix .. "Keybind" .. currBindID, boundKey)
+	end
 end
 
 function saveFloatValues()
-	
+	SetString(moddataPrefix .. "MaxTick", maxTick .. "")
+	SetInt(moddataPrefix .. "dAlt", damageAlternating)
+	SetInt(moddataPrefix .. "pAlt", particleAlternating)
 end

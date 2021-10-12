@@ -13,9 +13,11 @@ local erasingBinds = 0
 local erasingValues = 0
 
 local menuWidth = 0.20
-local menuHeight = 0.575
+local menuHeight = 0.65
 
 local maxTickBox = nil
+local dAltBox = nil
+local pAltBox = nil
 
 function menu_init()
 	
@@ -169,8 +171,6 @@ function menu_draw(dt)
 		
 		UiTranslate(UiWidth() * (menuWidth / 10), 0)
 		
-		UiTranslate(0, 30)
-		
 		UiFont("regular.ttf", 26)
 		UiAlign("left middle")
 		
@@ -189,6 +189,14 @@ function menu_draw(dt)
 		UiTranslate(0, 50 * (#bindOrder + 1))
 		
 		textboxClass_render(maxTickBox)
+		
+		UiTranslate(0, 50)
+		
+		textboxClass_render(dAltBox)
+		
+		UiTranslate(0, 50)
+		
+		textboxClass_render(pAltBox)
 		
 		UiPush()
 			UiTranslate(-165, 50)
@@ -239,6 +247,8 @@ end
 
 function setupTextBoxes()
 	local textBox01, newBox01 = textboxClass_getTextBox(1)
+	local textBox02, newBox02 = textboxClass_getTextBox(2)
+	local textBox03, newBox03 = textboxClass_getTextBox(3)
 	
 	if newBox01 then
 		textBox01.name = "Tick Speed"
@@ -251,6 +261,32 @@ function setupTextBoxes()
 		textBox01.onInputFinished = function(v) maxTick = tonumber(v) end
 		
 		maxTickBox = textBox01
+	end
+	
+	if newBox02 then
+		textBox02.name = "Damage Alternate"
+		textBox02.value = damageAlternating .. ""
+		textBox02.numbersOnly = true
+		textBox02.limitsActive = true
+		textBox02.numberMin = 0
+		textBox02.numberMax = 512
+		textBox02.description = "Damage alternation.\n Min: 0\nDefault: 5\nMax: 512"
+		textBox02.onInputFinished = function(v) damageAlternating = tonumber(v) end
+		
+		dAltBox = textBox02
+	end
+	
+	if newBox03 then
+		textBox03.name = "Particle Alternate"
+		textBox03.value = particleAlternating .. ""
+		textBox03.numbersOnly = true
+		textBox03.limitsActive = true
+		textBox03.numberMin = 0
+		textBox03.numberMax = 512
+		textBox03.description = "Particle alternation.\nMin: 0\nDefault: 5\nMax: 512"
+		textBox03.onInputFinished = function(v) particleAlternating = tonumber(v) end
+		
+		pAltBox = textBox03
 	end
 end
 
@@ -300,7 +336,15 @@ end
 
 function resetValues()
 	menuUpdateActions()
-	maxTickBox.value = 0.1
+	
+	maxTick = 0.1
+	maxTickBox.value = maxTick .. ""
+	
+	damageAlternating = 0
+	dAltBox.value = damageAlternating .. ""
+	
+	particleAlternating = 5
+	pAltBox.value = particleAlternating .. ""
 end
 
 function isMenuOpen()

@@ -17,7 +17,9 @@ local sphereRadius = 0.1
 maxTick = 0.1
 local currTick = maxTick
 
-local singleUnit = 1000 / 5
+damageAlternating = 0
+particleAlternating = 5
+local singleUnit = 2000 / 5
 local damageUnit = 0.5
 local num_pts = singleUnit * sphereRadius
 
@@ -35,17 +37,14 @@ function init()
 	saveFileInit()
 	menu_init()
 	
-	RegisterTool(toolName, toolReadableName, "MOD/vox/molotov.vox")
+	RegisterTool(toolName, toolReadableName, "MOD/vox/tool.vox")
 	SetBool("game.tool." .. toolName .. ".enabled", true)
-	--SetFloat("game.tool." .. toolName .. ".ammo", 100)
 end
 
 function tick(dt)
 	if not menu_disabled then
 		menu_tick(dt)
 	end
-	
-	--DebugWatch("nu", num_pts)
 	
 	local isMenuOpenRightNow = isMenuOpen()
 	
@@ -125,47 +124,19 @@ end
 
 function sphereLogic()
 	fibonacci_sphere(num_pts, spherePos, sphereRadius)
-	--[[for i = 1, num_pts do
-		local offsetI = (i - sphereLayers / 2)
-		local currentSphereRadius =  math.abs(sphereRadius / 100 * offsetI * 100)
-		local sphereHeight = VecAdd(spherePos, Vec(0, offsetI * layerHeight, 0))
-		
-		local offsetI = i - sphereLayers / 2
-		local currentSphereRadius = sphereRadius / sphereLayers * math.abs(offsetI)
-		local sphereHeight = VecAdd(spherePos, Vec(0, offsetI * layerHeight, 0))
-		for j = 1, spherePoints do
-			local point = posAroundCircle(j, spherePoints, sphereHeight, currentSphereRadius)
-			ParticleReset()
-			ParticleCollide(0)
-			SpawnParticle(point, Vec(), 1)
-		end
-		
-		local currPos = VecAdd(spherePos, test(i))
-		ParticleReset()
-		ParticleCollide(0)
-		SpawnParticle(currPos, Vec(), 1)
-	end]]--
-end
-
-function test(indices)
---local indices =  -- All floats from 0 to num_pts inclusively (for loop perhaps where i = float)
-
-	local phi = math.acos(1 - 2*indices/num_pts)
-	local theta = math.pi * (1 + 5*0.5) * indices
-
-	local x, y, z = math.cos(theta) * math.sin(phi), math.sin(theta) * math.sin(phi), math.cos(phi)
-	
-	return {x, y, z}
 end
 
 -- Really wish I understood this math :(
 function fibonacci_sphere(samples, offsetPos, radius)
 	local rnd = 1.0 * samples
 
-	local  offset = 2/samples
-	local  increment = math.pi * (3. - math.sqrt(5))
+	local offset = 2/samples
+	local increment = math.pi * (3. - math.sqrt(5))
 	
-	local alternating = 5
+	local pAlternating = particleAlternating
+	local dAlternating = damageAlternating
+	
+	particleSetup()
 
 	for i = 1, samples do
 		y = ((i * offset) - 1) + (offset / 2);
@@ -196,14 +167,15 @@ function fibonacci_sphere(samples, offsetPos, radius)
 		
 		local currPos = VecAdd(Vec(x, y, z), offsetPos)
 		
-		if alternating > 5 then
-			alternating = 0
+		if pAlternating > particleAlternating then
+			pAlternating = 0
 			spawnParticleAt(currPos)
 		end
 		
-		alternating = alternating + 1
+		pAlternating = pAlternating + 1
 		
-		if not firstHitDone then
+		if not firstHitDone and dAlternating > damageAlternating then
+			dAlternating = 0
 			if not getCutRimOnly() then
 				local soft = damageUnit
 				local medium = breakMediumMat and damageUnit or 0
@@ -218,6 +190,8 @@ function fibonacci_sphere(samples, offsetPos, radius)
 				end
 			end
 		end
+		
+		dAlternating = dAlternating + 1
 	end
 	
 	firstHitDone = true
@@ -228,15 +202,17 @@ end
 function getCutRimOnly()
 	return (not growOnX or not growOnY or not growOnZ) and rimOnly
 end
-
 -- Particle Functions
 
-function spawnParticleAt(pos)
+function particleSetup()
 	ParticleReset()
 	ParticleCollide(0)
 	ParticleColor(0, 0.5, 1, 
-				  0, 1, 1)
+				  1, 0, 1)
 	ParticleEmissive(1, 0)
+end
+
+function spawnParticleAt(pos)
 	local vel = Vec()
 	
 	local lifetime = 1 / 0.1 * maxTick
