@@ -14,6 +14,10 @@ local spherePos = Vec()
 
 local sphereRadius = 0.1
 
+local toolPos = Vec(0.25, -0.25, -0.5)
+local toolRot = 0
+local rotSpeed = 30
+
 maxTick = 0.1
 local currTick = maxTick
 
@@ -62,7 +66,13 @@ function tick(dt)
 		end
 	end
 	
-	if GetString("game.player.tool") ~= toolName or GetPlayerVehicle() ~= 0 or isMenuOpenRightNow then
+	if GetString("game.player.tool") ~= toolName or GetPlayerVehicle() ~= 0 then
+		return
+	end
+	
+	doToolAnim(dt)
+	
+	if isMenuOpenRightNow then
 		return
 	end
 	
@@ -199,6 +209,14 @@ function fibonacci_sphere(samples, offsetPos, radius)
 	return points
 end
 
+function doToolAnim(dt)
+	toolRot = toolRot + dt * rotSpeed
+
+	local tempRot = QuatEuler(0, toolRot, 0)
+	
+	SetToolTransform(Transform(toolPos, tempRot), 0)
+end
+
 function getCutRimOnly()
 	return (not growOnX or not growOnY or not growOnZ) and rimOnly
 end
@@ -207,8 +225,10 @@ end
 function particleSetup()
 	ParticleReset()
 	ParticleCollide(0)
-	ParticleColor(0, 0.5, 1, 
-				  1, 0, 1)
+	--[[ParticleColor(0, 0.5, 1, 
+				  1, 0, 1)]]--
+	ParticleColor(0, 0.5, 1,
+				  0, 1, 1)
 	ParticleEmissive(1, 0)
 end
 

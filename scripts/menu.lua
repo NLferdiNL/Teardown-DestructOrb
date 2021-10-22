@@ -270,7 +270,7 @@ function setupTextBoxes()
 		textBox02.limitsActive = true
 		textBox02.numberMin = 0
 		textBox02.numberMax = 512
-		textBox02.description = "Damage alternation.\n Min: 0\nDefault: 5\nMax: 512"
+		textBox02.description = "Damage alternation.\n Min: 0\nDefault: 0\nMax: 512"
 		textBox02.onInputFinished = function(v) damageAlternating = tonumber(v) end
 		
 		dAltBox = textBox02
