@@ -2,6 +2,7 @@
 
 binds = {
 	Shoot = "usetool",
+	Alt_Fire = "rmb",
 	Disable_Sphere = "r",
 }
 
@@ -13,6 +14,7 @@ bindOrder = {
 		
 bindNames = {
 	Shoot = "Shoot",
+	Alt_Fire = "Alt Fire",
 	Disable_Sphere = "Disable Sphere",
 }
 

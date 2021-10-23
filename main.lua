@@ -35,6 +35,13 @@ growOnY = true
 growOnZ = true
 rimOnly = true
 
+showAxis = true
+
+local indicatorPos = Vec()
+local xEndPoint = Vec()
+local yEndPoint = Vec()
+local zEndPoint = Vec()
+
 local firstHitDone = false
 
 function init()
@@ -72,12 +79,20 @@ function tick(dt)
 	
 	doToolAnim(dt)
 	
+	if showAxis then
+		getAxisPositions()
+	end
+	
 	if isMenuOpenRightNow then
 		return
 	end
 	
 	if InputPressed(binds["Shoot"]) then
 		shootLogic()
+	end
+	
+	if InputPressed(binds["Alt_Fire"]) then
+		setMenuOpen(true)
 	end
 end
 
@@ -93,9 +108,122 @@ function draw(dt)
 			UiText("Destruction sphere active.\n[" .. binds["Disable_Sphere"]:upper() .. "] to disable.")
 		UiPop()
 	end
+	
+	if GetString("game.player.tool") ~= toolName or GetPlayerVehicle() ~= 0 then
+		return
+	end
+	
+	if showAxis then
+		drawXYZIndicator()
+	end
 end
 
 -- UI Functions (excludes sound specific functions)
+
+function getAxisPositions()
+	local cameraTransform = GetCameraTransform()
+	local pos = cameraTransform.pos
+	local dir = TransformToParentVec(cameraTransform, Vec(-0.75, -0.4, -1))
+	
+	indicatorPos = VecAdd(dir, pos)
+	
+	local lineLength = 0.05
+	
+	xEndPoint = VecAdd(indicatorPos, Vec(lineLength, 0, 0))
+	yEndPoint = VecAdd(indicatorPos, Vec(0, lineLength, 0))
+	zEndPoint = VecAdd(indicatorPos, Vec(0, 0, lineLength))
+	
+	if growOnX then
+		DebugLine(indicatorPos, xEndPoint, 1, 0, 0, 1)
+	else
+		DebugLine(indicatorPos, xEndPoint, 0.25, 0.25, 0.25, 1)
+	end
+	
+	if growOnY then
+		DebugLine(indicatorPos, yEndPoint, 0, 1, 0, 1)
+	else
+		DebugLine(indicatorPos, yEndPoint, 0.25, 0.25, 0.25, 1)
+	end
+	
+	if growOnZ then
+		DebugLine(indicatorPos, zEndPoint, 0, 0, 1, 1)
+	else
+		DebugLine(indicatorPos, zEndPoint, 0.25, 0.25, 0.25, 1)
+	end
+end
+
+function drawXYZIndicator()
+	UiPush()
+		UiFont("regular.ttf", 20)
+		--[[local x = UiWidth() * 0.1
+		local y = UiHeight() * 0.95
+		
+		local dir = UiPixelToWorld(x, y)
+		local cameraTransform = GetCameraTransform()
+		local pos = cameraTransform.pos
+		
+		indicatorPos = VecAdd(dir, pos)
+		
+		local lineLength = 0.05
+		
+		xEndPoint = VecAdd(indicatorPos, Vec(lineLength, 0, 0))
+		yEndPoint = VecAdd(indicatorPos, Vec(0, lineLength, 0))
+		zEndPoint = VecAdd(indicatorPos, Vec(0, 0, lineLength))]]--
+		
+		UiColor(0.25, 0.25, 0.25, 1)
+		
+		UiAlign("center bottom")
+		
+		UiPush()
+			UiFont("bold.ttf", 26)
+		
+			local iX, iY = UiWorldToPixel(indicatorPos)
+			
+			iY = iY - 75
+			
+			UiTranslate(iX, iY)
+			
+			UiColor(1, 1, 1, 1)
+			UiTextOutline(0, 0, 0, 1, 0.2)
+			--UiTextShadow
+			UiText("DestructOrb Axis")
+		UiPop()
+		
+		UiPush()
+			local xX, xY = UiWorldToPixel(xEndPoint)
+			UiTranslate(xX, xY)
+			
+			if growOnX then
+				UiColor(1, 0, 0, 1)
+			end
+			
+			UiText("X")
+		UiPop()
+		
+		UiPush()
+			local yX, yY = UiWorldToPixel(yEndPoint)
+			UiTranslate(yX, yY)
+			
+			if growOnY then
+				UiColor(0, 1, 0, 1)
+			end
+			
+			UiText("Y")
+		UiPop()
+		
+		UiPush()
+			local zX, zY = UiWorldToPixel(zEndPoint)
+			UiTranslate(zX, zY)
+			
+			if growOnZ then
+				UiColor(0, 0, 1, 1)
+			end
+			
+			UiText("Z")
+		UiPop()
+	UiPop()
+end
+
 -- Creation Functions
 
 -- Object handlers

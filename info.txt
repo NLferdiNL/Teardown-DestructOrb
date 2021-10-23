@@ -1,4 +1,4 @@
 name = DestructOrb
 author = NLferdiNL
 description = Growing destruction orb.
-tags = Gameplay, Weapon
+tags = Tool

@@ -7,6 +7,7 @@ function saveFileInit()
 	maxTick = tonumber(GetString(moddataPrefix .. "MaxTick"))
 	damageAlternating = GetInt(moddataPrefix .. "dAlt")
 	particleAlternating = GetInt(moddataPrefix .. "pAlt")
+	showAxis = GetBool(moddataPrefix.. "ShowAxis")
 	
 	loadKeyBinds()
 	
@@ -22,6 +23,14 @@ function saveFileInit()
 		
 		particleAlternating = 5
 		SetInt(moddataPrefix .. "pAlt", particleAlternating)
+	end
+	
+	if saveVersion < 2 then
+		saveVersion = 2
+		SetInt(moddataPrefix .. "Version", saveVersion)
+		
+		showAxis = true
+		SetBool(moddataPrefix.. "ShowAxis", showAxis)
 	end
 end
 
@@ -48,8 +57,11 @@ function saveKeyBinds()
 	end
 end
 
-function saveFloatValues()
+function saveData()
+	saveKeyBinds()
+	
 	SetString(moddataPrefix .. "MaxTick", maxTick .. "")
 	SetInt(moddataPrefix .. "dAlt", damageAlternating)
 	SetInt(moddataPrefix .. "pAlt", particleAlternating)
+	SetBool(moddataPrefix.. "ShowAxis", showAxis)
 end

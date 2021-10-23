@@ -12,8 +12,8 @@ local rebinding = nil
 local erasingBinds = 0
 local erasingValues = 0
 
-local menuWidth = 0.20
-local menuHeight = 0.65
+local menuWidth = 0.40
+local menuHeight = 0.45
 
 local maxTickBox = nil
 local dAltBox = nil
@@ -145,37 +145,11 @@ function greenAttentionButtonStyle()
 	UiButtonImageBox("MOD/sprites/square.png", 6, 6, otherStrength, greenStrength, otherStrength, 0.5)
 end
 
-function menu_draw(dt)
-	if not isMenuOpen() then
-		return
-	end
-	
-	UiMakeInteractive()
-	
+function leftSideMenu()
 	UiPush()
-		UiBlur(0.75)
-		
-		UiAlign("center middle")
-		UiTranslate(UiWidth() * 0.5, UiHeight() * 0.5)
+		UiTranslate(-UiWidth() * menuWidth / 5, 0)
 		
 		UiPush()
-			UiColorFilter(0, 0, 0, 0.25)
-			UiImageBox("MOD/sprites/square.png", UiWidth() * menuWidth, UiHeight() * menuHeight, 10, 10)
-		UiPop()
-		
-		UiWordWrap(UiWidth() * menuWidth)
-		
-		UiTranslate(0, -UiHeight() * (menuHeight / 2))
-		
-		drawTitle()
-		
-		UiTranslate(UiWidth() * (menuWidth / 10), 0)
-		
-		UiFont("regular.ttf", 26)
-		UiAlign("left middle")
-		
-		UiPush()
-			UiTranslate(0, 50)
 			for i = 1, #bindOrder do
 				local id = bindOrder[i]
 				local key = binds[id]
@@ -184,9 +158,13 @@ function menu_draw(dt)
 			end
 		UiPop()
 		
-		setupTextBoxes()
+		UiTranslate(0, 50 * (#bindOrder))
 		
-		UiTranslate(0, 50 * (#bindOrder + 1))
+		UiWordWrap(250)
+		
+		UiText("This menu can be opened with right click too.")
+		
+		UiTranslate(0, 50)
 		
 		textboxClass_render(maxTickBox)
 		
@@ -198,8 +176,16 @@ function menu_draw(dt)
 		
 		textboxClass_render(pAltBox)
 		
+		UiTranslate(0, 50)
+		
+		drawToggle("Show Axis:", showAxis, function(v) showAxis = v end)
+	UiPop()
+end
+
+function rightSideMenu()
+	UiPush()
 		UiPush()
-			UiTranslate(-165, 50)
+			UiTranslate(UiWidth() * menuWidth / 5, 0)
 			
 			UiFont("regular.ttf", 20)
 			drawToggle("Break medium materials:", breakMediumMat, function(v) 
@@ -232,6 +218,45 @@ function menu_draw(dt)
 			UiTranslate(0, 50)
 			drawToggle("Rim damage only:", rimOnly, function(v) rimOnly = v end)
 		UiPop()
+	UiPop()
+end
+
+function menu_draw(dt)
+	if not isMenuOpen() then
+		return
+	end
+	
+	UiMakeInteractive()
+	
+	UiPush()
+		UiBlur(0.75)
+		
+		UiAlign("center middle")
+		UiTranslate(UiWidth() * 0.5, UiHeight() * 0.5)
+		
+		UiPush()
+			UiColorFilter(0, 0, 0, 0.25)
+			UiImageBox("MOD/sprites/square.png", UiWidth() * menuWidth, UiHeight() * menuHeight, 10, 10)
+		UiPop()
+		
+		UiWordWrap(UiWidth() * menuWidth)
+		
+		UiTranslate(0, -UiHeight() * (menuHeight / 2))
+		
+		drawTitle()
+		
+		--UiTranslate(UiWidth() * (menuWidth / 10), 0)
+		
+		UiFont("regular.ttf", 26)
+		UiAlign("center middle")
+		
+		setupTextBoxes()
+		
+		UiTranslate(0, 50)
+		
+		leftSideMenu()
+		
+		rightSideMenu()
 	UiPop()
 	
 	UiPush()
@@ -330,8 +355,7 @@ function menuCloseActions()
 	rebinding = nil
 	erasingBinds = 0
 	erasingValues = 0
-	saveKeyBinds()
-	saveFloatValues()
+	saveData()
 end
 
 function resetValues()
