@@ -25,6 +25,7 @@ damageAlternating = 0
 particleAlternating = 5
 local singleUnit = 2000 / 5
 local damageUnit = 0.5
+local growthSize = 0.05
 local num_pts = singleUnit * sphereRadius
 
 breakMediumMat = true
@@ -65,7 +66,7 @@ function tick(dt)
 		
 		if currTick <= 0 then
 			currTick = maxTick
-			updateSphere(0.05)
+			updateSphere(growthSize)
 		end
 		
 		if InputPressed(binds["Disable_Sphere"]) then
@@ -89,10 +90,6 @@ function tick(dt)
 	
 	if InputPressed(binds["Shoot"]) then
 		shootLogic()
-	end
-	
-	if InputPressed(binds["Alt_Fire"]) then
-		setMenuOpen(true)
 	end
 end
 
@@ -318,13 +315,19 @@ function fibonacci_sphere(samples, offsetPos, radius)
 				local soft = damageUnit
 				local medium = breakMediumMat and damageUnit or 0
 				local hard = breakHardMat and damageUnit or 0
-				MakeHole(currPos, soft, medium, hard)
+				--local hit = QueryClosestPoint(currPos, damageUnit)
+				--if hit then 
+					MakeHole(currPos, soft, medium, hard) 
+				--end
 			else
 				if VecDist(currPos, spherePos) > radius * 0.98 then
 					local soft = damageUnit
 					local medium = breakMediumMat and damageUnit or 0
 					local hard = breakHardMat and damageUnit or 0
-					MakeHole(currPos, soft, medium, hard)
+					--local hit = QueryClosestPoint(currPos, damageUnit)
+					--if hit then 
+						MakeHole(currPos, soft, medium, hard) 
+					--end
 				end
 			end
 		end

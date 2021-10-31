@@ -2,7 +2,7 @@
 
 binds = {
 	Shoot = "usetool",
-	Alt_Fire = "rmb",
+	Open_Menu = "c",
 	Disable_Sphere = "r",
 }
 
@@ -10,11 +10,12 @@ local bindBackup = deepcopy(binds)
 
 bindOrder = {
 	"Disable_Sphere",
+	"Open_Menu"
 }
 		
 bindNames = {
 	Shoot = "Shoot",
-	Alt_Fire = "Alt Fire",
+	Open_Menu = "Open Menu",
 	Disable_Sphere = "Disable Sphere",
 }
 

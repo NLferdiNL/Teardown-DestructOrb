@@ -1,4 +1,4 @@
 name = DestructOrb
 author = NLferdiNL
-description = Growing destruction orb.
+description = [noupload]Growing destruction orb.
 tags = Tool

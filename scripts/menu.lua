@@ -25,7 +25,11 @@ end
 
 function menu_tick(dt)
 	if PauseMenuButton(toolReadableName .. " Settings") then
-		menuOpened = true
+		setMenuOpen(true)
+	end
+	
+	if GetString("game.player.tool") == toolName and GetPlayerVehicle() == 0 and InputPressed(binds["Open_Menu"]) then
+		setMenuOpen(not menuOpened)
 	end
 	
 	if menuOpened and not menuOpenLastFrame then
@@ -159,12 +163,6 @@ function leftSideMenu()
 		UiPop()
 		
 		UiTranslate(0, 50 * (#bindOrder))
-		
-		UiWordWrap(250)
-		
-		UiText("This menu can be opened with right click too.")
-		
-		UiTranslate(0, 50)
 		
 		textboxClass_render(maxTickBox)
 		

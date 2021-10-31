@@ -8,6 +8,13 @@ function saveFileInit()
 	damageAlternating = GetInt(moddataPrefix .. "dAlt")
 	particleAlternating = GetInt(moddataPrefix .. "pAlt")
 	showAxis = GetBool(moddataPrefix.. "ShowAxis")
+	breakMediumMat = GetBool(moddataPrefix.. "BreakMediumMat")
+	breakHardMat = GetBool(moddataPrefix.. "BreakHardMat")
+	growOnX = GetBool(moddataPrefix.. "GrowOnX")
+	growOnY = GetBool(moddataPrefix.. "GrowOnY")
+	growOnZ = GetBool(moddataPrefix.. "GrowOnZ")
+	rimOnly = GetBool(moddataPrefix.. "RimOnly")
+
 	
 	loadKeyBinds()
 	
@@ -31,6 +38,29 @@ function saveFileInit()
 		
 		showAxis = true
 		SetBool(moddataPrefix.. "ShowAxis", showAxis)
+	end
+	
+	if saveVersion < 3 then
+		saveVersion = 3
+		SetInt(moddataPrefix .. "Version", saveVersion)
+		
+		breakMediumMat = true
+		SetBool(moddataPrefix.. "BreakMediumMat", breakMediumMat)
+		
+		breakHardMat = true
+		SetBool(moddataPrefix.. "BreakHardMat", breakHardMat)
+		
+		growOnX = true 
+		SetBool(moddataPrefix.. "GrowOnX", growOnX)
+		
+		growOnY = true
+		SetBool(moddataPrefix.. "GrowOnY", growOnY)
+		
+		growOnZ = true
+		SetBool(moddataPrefix.. "GrowOnZ", growOnZ)
+		
+		rimOnly = true
+		SetBool(moddataPrefix.. "RimOnly", rimOnly)
 	end
 end
 
@@ -61,7 +91,15 @@ function saveData()
 	saveKeyBinds()
 	
 	SetString(moddataPrefix .. "MaxTick", maxTick .. "")
+	
 	SetInt(moddataPrefix .. "dAlt", damageAlternating)
 	SetInt(moddataPrefix .. "pAlt", particleAlternating)
+	
 	SetBool(moddataPrefix.. "ShowAxis", showAxis)
+	SetBool(moddataPrefix.. "BreakMediumMat", breakMediumMat)
+	SetBool(moddataPrefix.. "BreakHardMat", breakHardMat)
+	SetBool(moddataPrefix.. "GrowOnX", growOnX)
+	SetBool(moddataPrefix.. "GrowOnY", growOnY)
+	SetBool(moddataPrefix.. "GrowOnZ", growOnZ)
+	SetBool(moddataPrefix.. "RimOnly", rimOnly)
 end
