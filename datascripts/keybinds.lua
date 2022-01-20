@@ -2,6 +2,7 @@
 
 binds = {
 	Shoot = "usetool",
+	Alt_Fire = "grab",
 	Open_Menu = "c",
 	Disable_Sphere = "r",
 }
@@ -15,6 +16,7 @@ bindOrder = {
 		
 bindNames = {
 	Shoot = "Shoot",
+	Alt_Fire = "Alt Fire",
 	Open_Menu = "Open Menu",
 	Disable_Sphere = "Disable Sphere",
 }

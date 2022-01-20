@@ -28,6 +28,10 @@ local damageUnit = 0.5
 local growthSize = 0.05
 local num_pts = singleUnit * sphereRadius
 
+local firstPointSet = false
+local firstPointParticleOffset = 0
+local firstPoint = nil
+
 breakMediumMat = true
 breakHardMat = true
 
@@ -75,6 +79,7 @@ function tick(dt)
 	end
 	
 	if GetString("game.player.tool") ~= toolName or GetPlayerVehicle() ~= 0 then
+		firstPointSet = false
 		return
 	end
 	
@@ -88,8 +93,18 @@ function tick(dt)
 		return
 	end
 	
-	if InputPressed(binds["Shoot"]) then
+	if firstPointSet then
+		drawRadiusLine(dt)
+	end
+	
+	if InputPressed(binds["Shoot"]) and not firstPointSet then
 		shootLogic()
+	elseif InputPressed(binds["Alt_Fire"]) or (firstPointSet and InputPressed(binds["Shoot"])) then
+		altFireLogic()
+	end
+	
+	if InputPressed(binds["Disable_Sphere"]) then
+		firstPointSet = false
 	end
 end
 
@@ -240,7 +255,7 @@ function updateSphere(radius)
 	firstHitDone = false
 end
 
-function shootLogic()
+function getTargetPos()
 	local cameraTransform = GetPlayerCameraTransform()
 	local origin = cameraTransform.pos
 	local direction = TransformToParentVec(cameraTransform, Vec(0, 0, -1))
@@ -248,13 +263,45 @@ function shootLogic()
 	local hit, hitPoint, normal = raycast(origin, direction)
 	
 	if not hit then
+		return nil
+	end
+	
+	return hitPoint
+end
+
+function activateSphereAt(pos)
+	spherePos = VecCopy(pos)
+	sphereActive = true
+end
+
+function shootLogic()
+	local hitPoint = getTargetPos()
+	
+	if hitPoint == nil then
 		return
 	end
 	
 	--local offsetHit = VecAdd(hitPoint, VecScale(normal, 5))
 	
-	spherePos = hitPoint
-	sphereActive = true
+	activateSphereAt(hitPoint)
+end
+
+function altFireLogic()
+	local hitPoint = getTargetPos()
+	
+	if hitPoint == nil then
+		return
+	end
+
+	if not firstPointSet then
+		firstPointSet = true
+		firstPoint = VecCopy(hitPoint)
+		return
+	end
+	
+	sphereRadius = VecDist(firstPoint, hitPoint)
+	activateSphereAt(firstPoint)
+	firstPointSet = false
 end
 
 function sphereLogic()
@@ -338,6 +385,47 @@ function fibonacci_sphere(samples, offsetPos, radius)
 	firstHitDone = true
 
 	return points
+end
+
+function setupRadiusLineParticle()
+	ParticleReset()
+	ParticleType("smoke")
+	ParticleTile(4)
+	ParticleColor(0, 0.5, 1)
+	ParticleEmissive(1)
+	ParticleRadius(0.2)
+	ParticleAlpha(1, 0)
+	ParticleCollide(0)
+end
+
+function drawRadiusLine(dt)
+	if not firstPointSet then
+		return
+	end
+
+	local hitPoint = getTargetPos()
+	
+	if hitPoint == nil then
+		return
+	end
+	
+	--DebugLine(firstPoint, hitPoint)
+	
+	setupRadiusLineParticle()
+	
+	local dirToHitPoint = VecDir(firstPoint, hitPoint)
+	
+	firstPointParticleOffset = firstPointParticleOffset + dt * 2
+	
+	if firstPointParticleOffset > 0.5 then
+		firstPointParticleOffset = 0
+	end
+	
+	for i = 0, VecDist(firstPoint, hitPoint), 0.5 do
+		local currPos = VecAdd(firstPoint, VecScale(dirToHitPoint, i + firstPointParticleOffset))
+		
+		SpawnParticle(currPos, Vec(), 0.05)
+	end
 end
 
 function doToolAnim(dt)
